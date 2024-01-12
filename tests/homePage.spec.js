@@ -15,12 +15,12 @@ test.describe("QA Auto home page tests", () => {
 
     await test.step("opening the Log in modal window", async () => {
       await homePage.signInButton.click();
-      expect(homePage.logInModalHeader).toBeVisible;
+      await expect(homePage.logInModalHeader).toBeVisible();
     });
 
     await test.step("opening the Registration modal window", async () => {
       await homePage.registrationButton.click();
-      expect(homePage.registrationModalHeader).toBeVisible;
+      await expect(homePage.registrationModalHeader).toBeVisible();
     });
 
     await test.step("filling up the registration form", async () => {
@@ -42,8 +42,8 @@ test.describe("QA Auto home page tests", () => {
     await test.step("clicking the register button and verifying if the user is created", async () => {
       await homePage.registerButton.click();
 
-      expect(headerSection.garageButton).toBeVisible;
-      expect(headerSection.myProfileButton).toBeVisible;
+      await expect(headerSection.garageButton).toBeVisible();
+      await expect(headerSection.myProfileButton).toBeVisible();
     });
   });
 });
