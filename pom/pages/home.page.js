@@ -1,5 +1,3 @@
-import { Locator } from "@playwright/test";
-
 export class HomePage {
   constructor(page) {
     this.page = page;
