@@ -2,9 +2,7 @@ import { test, expect } from "@playwright/test";
 import { ProfilePage } from "../../pom/pages/profile.page";
 
 test.describe("Profile page test", () => {
-  test.only("The profile image should be uploaded and updated", async ({
-    page,
-  }) => {
+  test("The profile image should be uploaded and updated", async ({ page }) => {
     const profilePage = new ProfilePage(page);
 
     await test.step("opening the garage page", async () => {
