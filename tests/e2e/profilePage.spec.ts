@@ -6,7 +6,7 @@ test.describe("Profile page test", () => {
     const profilePage = new ProfilePage(page);
 
     await test.step("opening the garage page", async () => {
-      await page.goto("/");
+      await profilePage.openGaragePage();
       await expect(page).toHaveURL(/\/panel\/garage\/?$/);
     });
 
@@ -18,7 +18,7 @@ test.describe("Profile page test", () => {
     });
 
     await test.step("uploading the image", async () => {
-      await page.setInputFiles('input[name="photo"]', "media/gar1.png");
+      await profilePage.setPhotoInputFile("media/gar1.png");
       await profilePage.saveButton.click();
 
       await expect(profilePage.successPopup).toBeVisible();
