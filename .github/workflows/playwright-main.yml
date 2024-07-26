@@ -78,7 +78,7 @@ jobs:
 
       - name: Save Playwright browsers cache
         id: cache-playwright-save
-        if: ${{ steps.cache-playwright-restore.outputs.cache-hit != 'true' }}
+        if: always() && ${{ steps.cache-playwright-restore.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: ~/.cache/ms-playwright
