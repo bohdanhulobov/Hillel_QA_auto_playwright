@@ -1,0 +1,129 @@
+name: Playwright Tests - Main env
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches: [production]
+  workflow_dispatch:
+
+jobs:
+  playwright-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2]
+        shardTotal: [2]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore Node.js modules cache
+        id: cache-node-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/yarn
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            node-modules-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Restore Playwright browsers cache
+        id: cache-playwright-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            playwright-
+
+      - name: Install Playwright browsers
+        run: yarn playwright install chromium --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test --ignore-snapshots --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        env:
+          FIRST_NAME: ${{ secrets.FIRST_NAME }}
+          LAST_NAME: ${{ secrets.LAST_NAME }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: blob-report
+          retention-days: 1
+
+      - name: Save Node.js modules cache
+        if: ${{ steps.cache-playwright-restore.outputs.cache-hit != 'true' }}
+        id: cache-node-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/yarn
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Save Playwright browsers cache
+        id: cache-playwright-save
+        if: ${{ steps.cache-playwright-restore.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('**/yarn.lock') }}
+
+  merge-reports:
+    if: ${{ !cancelled() }}
+    needs: [playwright-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Restore Node.js modules cache
+        id: cache-node-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/yarn
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            node-modules-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report--attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 30
