@@ -160,7 +160,7 @@ jobs:
               });
             } else {
               // If the workflow is triggered manually or not by a pull request
-              console.log(`Workflow run manually. Playwright report URL: ${deploymentUrl}`);
+              console.log(`Workflow run manually. Playwright report URL is here: ${deploymentUrl}`);
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
