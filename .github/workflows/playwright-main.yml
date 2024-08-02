@@ -92,6 +92,8 @@ jobs:
       id-token: write
       contents: read
       pages: write
+      issues: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -130,7 +132,7 @@ jobs:
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report/
-          retention-days: 30
+          retention-days: 5
 
       - name: Setup Pages
         uses: actions/configure-pages@v5.0.0
@@ -160,7 +162,7 @@ jobs:
               });
             } else {
               // If the workflow is triggered manually or not by a pull request
-              console.log(`Workflow run manually. Playwright report URL is here: ${deploymentUrl}`);
+              console.log(`Workflow run manually. Playwright report URL: ${deploymentUrl}`);
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
