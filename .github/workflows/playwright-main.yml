@@ -31,7 +31,7 @@ jobs:
         run: npx playwright install chromium --with-deps --only-shell
 
       - name: Run Playwright tests
-        run: npx playwright test tests/e2e/homePage.spec.js --ignore-snapshots --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npx playwright test tests/e2e/homePage.spec.js --project="chromium" --ignore-snapshots --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
           FIRST_NAME: ${{ secrets.FIRST_NAME }}
           LAST_NAME: ${{ secrets.LAST_NAME }}
@@ -55,6 +55,7 @@ jobs:
       contents: read
       pages: write
       pull-requests: write
+      statuses: write
 
     steps:
       - name: Checkout code
