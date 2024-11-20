@@ -2,7 +2,7 @@ name: Playwright Tests - Main env
 on:
   pull_request:
     types: [opened, reopened]
-    branches: [production]
+    branches: [production, main]
   workflow_dispatch:
 
 jobs:
